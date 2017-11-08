@@ -1,6 +1,6 @@
 import unittest
 
-from analyse_template import TemplateAnalyser
+from analyse_template import TemplateAnalyser, EpicsInfo
 
 
 class BasicTemplateAnalyserTest(unittest.TestCase):
@@ -142,3 +142,11 @@ class FullFileAnalyserTest(unittest.TestCase):
         self.assertEqual(field_list[5].is_field, True)
         self.assertEqual(field_list[6].is_field, False)
         self.assertEqual(field_list[6].is_info, True)
+
+    def test_number_of_records_with_info(self):
+        counter = 0
+        records = self.analyser.records
+        for record in records:
+            if any(isinstance(field, EpicsInfo) for field in record.fields):
+                counter += 1
+        self.assertEqual(counter, 15)
