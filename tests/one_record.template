@@ -1,0 +1,5 @@
+record(longin, "$(P)$(R)BPMFWVersion_RBV") {
+    field(DTYP, "asynInt32")
+    field(INP,  "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_FW_VERSION")
+    field(SCAN, "I/O Intr")
+}
