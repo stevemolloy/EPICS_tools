@@ -52,7 +52,7 @@ class EpicsRecord:
         raw_field_list = re.split('field', self.body_string)
         ret_list = [EpicsField(raw_field)
                     for raw_field in raw_field_list
-                    if raw_field and not 'info' in raw_field]
+                    if raw_field and 'info' not in raw_field]
         for raw_field in raw_field_list:
             if 'info' in raw_field:
                 info_split = raw_field.split('info')
@@ -64,6 +64,7 @@ class EpicsRecord:
 class EpicsField:
     is_field = True
     is_info = False
+
     def __init__(self, raw_string):
         assert(raw_string.startswith('('))
         assert(raw_string.endswith(')'))
