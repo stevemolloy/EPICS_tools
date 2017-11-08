@@ -58,3 +58,87 @@ class OneRecordFileAnalyserTest(unittest.TestCase):
         self.assertEqual(fields[0].field_name, "asynInt32")
         self.assertEqual(fields[1].field_name, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_FW_VERSION")
         self.assertEqual(fields[2].field_name, "I/O Intr")
+
+
+class FullFileAnalyserTest(unittest.TestCase):
+    def setUp(self):
+        self.analyser = TemplateAnalyser('SIS8300bpm.template')
+
+    def test_file_has_record_list(self):
+        self.assertEqual(len(self.analyser.records), 48)
+
+    def test_record_types(self):
+        records = self.analyser.records
+        self.assertEqual(records[0].record_type, "longin")
+        self.assertEqual(records[4].record_type, "longout")
+        self.assertEqual(records[10].record_type, "longin")
+        self.assertEqual(records[11].record_type, "mbbo")
+        self.assertEqual(records[12].record_type, "mbbi")
+        self.assertEqual(records[-12].record_type, "ai")
+        self.assertEqual(records[-5].record_type, "bi")
+        self.assertEqual(records[-2].record_type, "bo")
+        self.assertEqual(records[-1].record_type, "seq")
+
+    def test_record_names(self):
+        records = self.analyser.records
+        self.assertEqual(records[0].record_name, "$(P)$(R)BPMFWVersion_RBV")
+        self.assertEqual(records[4].record_name, "$(P)$(R)NearIQM")
+        self.assertEqual(records[10].record_name, "$(P)$(R)NumBPMSamples_RBV")
+        self.assertEqual(records[11].record_name, "$(P)$(R)MemMux")
+        self.assertEqual(records[12].record_name, "$(P)$(R)MemMux_RBV")
+        self.assertEqual(records[-12].record_name, "$(P)$(R)FilterGain_RBV")
+        self.assertEqual(records[-5].record_name, "$(P)$(R)SelfTrigChRef_RBV")
+        self.assertEqual(records[-2].record_name, "$(P)$(R)BPM:Enable")
+        self.assertEqual(records[-1].record_name, "$(P)$(R)BPM:EnableSeq")
+
+    def test_first_record_types(self):
+        first_record = self.analyser.records[0]
+        field_list = first_record.fields
+        self.assertEqual(len(field_list), 3)
+        self.assertEqual(field_list[0].field_type, 'DTYP')
+        self.assertEqual(field_list[1].field_type, 'INP')
+        self.assertEqual(field_list[2].field_type, 'SCAN')
+
+    def test_first_record_names(self):
+        first_record = self.analyser.records[0]
+        field_list = first_record.fields
+        self.assertEqual(len(field_list), 3)
+        self.assertEqual(field_list[0].field_name, "asynInt32")
+        self.assertEqual(field_list[1].field_name, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_FW_VERSION")
+        self.assertEqual(field_list[2].field_name, "I/O Intr")
+
+    def test_fourth_record_types(self):
+        first_record = self.analyser.records[4]
+        field_list = first_record.fields
+        self.assertEqual(len(field_list), 7)
+        self.assertEqual(field_list[0].field_type, 'DTYP')
+        self.assertEqual(field_list[1].field_type, 'OUT')
+        self.assertEqual(field_list[2].field_type, 'DRVH')
+        self.assertEqual(field_list[3].field_type, 'DRVL')
+        self.assertEqual(field_list[4].field_type, 'PINI')
+        self.assertEqual(field_list[5].field_type, 'VAL')
+        self.assertEqual(field_list[6].field_type, 'autosaveFields')
+
+    def test_fourth_record_names(self):
+        first_record = self.analyser.records[4]
+        field_list = first_record.fields
+        self.assertEqual(len(field_list), 7)
+        self.assertEqual(field_list[0].field_name, "asynInt32")
+        self.assertEqual(field_list[1].field_name, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_NEARIQ_M")
+        self.assertEqual(field_list[2].field_name, "255")
+        self.assertEqual(field_list[3].field_name, "0")
+        self.assertEqual(field_list[4].field_name, "YES")
+        self.assertEqual(field_list[5].field_name, "4")
+        self.assertEqual(field_list[6].field_name, "VAL")
+
+    def test_fourth_record_contains_info(self):
+        first_record = self.analyser.records[4]
+        field_list = first_record.fields
+        self.assertEqual(field_list[0].is_field, True)
+        self.assertEqual(field_list[1].is_field, True)
+        self.assertEqual(field_list[2].is_field, True)
+        self.assertEqual(field_list[3].is_field, True)
+        self.assertEqual(field_list[4].is_field, True)
+        self.assertEqual(field_list[5].is_field, True)
+        self.assertEqual(field_list[6].is_field, False)
+        self.assertEqual(field_list[6].is_info, True)

@@ -6,9 +6,9 @@ class TemplateAnalyser:
         self.filename = filename
         with open(self.filename) as f:
             self.contents = [line for line in f if not line.strip().startswith('#')]
+        self.records = self.get_records()
 
-    @property
-    def records(self):
+    def get_records(self):
         records_start = [ind for ind, val in enumerate(self.contents) if val.startswith('record')]
         records_end = records_start[1:] + [None]
         records_list = [
@@ -28,23 +28,33 @@ class EpicsRecord:
         split_string = re.split('[{}]', raw_record_string)
         self.instantiation_string = split_string[0]
         self.body_string = split_string[1]
+        self.record_type = self.get_record_type()
 
-    @property
-    def record_type(self):
+    def get_record_type(self):
         stripped_string = self.instantiation_string.replace('record(', '')
         return stripped_string.split(',')[0]
 
     @property
     def record_name(self):
         return self.instantiation_string.split('"')[1]
-    
+
     @property
     def fields(self):
-        raw_field_list = re.split('field|info', self.body_string)
-        return [EpicsField(raw_field) for raw_field in raw_field_list if raw_field]
+        raw_field_list = re.split('field', self.body_string)
+        ret_list = [EpicsField(raw_field)
+                    for raw_field in raw_field_list
+                    if raw_field and not 'info' in raw_field]
+        for raw_field in raw_field_list:
+            if 'info' in raw_field:
+                info_split = raw_field.split('info')
+                ret_list.append(EpicsField(info_split[0]))
+                ret_list.append(EpicsInfo(info_split[1]))
+        return ret_list
 
 
 class EpicsField:
+    is_field = True
+    is_info = False
     def __init__(self, raw_string):
         assert(raw_string.startswith('('))
         assert(raw_string.endswith(')'))
@@ -60,6 +70,11 @@ class EpicsField:
         name_field = name_field.replace('"', '')
         name_field = name_field.strip()
         return name_field[:-1]
+
+
+class EpicsInfo(EpicsField):
+    is_field = False
+    is_info = True
 
 
 if __name__ == '__main__':
