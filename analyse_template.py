@@ -94,6 +94,12 @@ class EpicsInfo(EpicsField):
 
 
 if __name__ == '__main__':
+    from collections import Counter
+
     analyser = TemplateAnalyser('tests/SIS8300bpm.template')
+
+    type_ctr = Counter()
     for record in analyser.records:
-        print(record)
+        type_ctr[record.record_type] += 1
+    for record_type in type_ctr.most_common():
+        print(record_type)
