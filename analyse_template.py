@@ -24,8 +24,8 @@ class TemplateAnalyser:
 
     def __repr__(self):
         repr_str = ''
-        for record in self.records:
-            repr_str += record.__repr__() + '\n'
+        for rec in self.records:
+            repr_str += rec.__repr__() + '\n'
         return repr_str
 
 
