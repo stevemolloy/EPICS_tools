@@ -22,6 +22,12 @@ class TemplateAnalyser:
         stripped_lines = [l.strip() for l in list_of_lines]
         return ''.join(stripped_lines)
 
+    def __repr__(self):
+        repr_str = ''
+        for record in self.records:
+            repr_str += record.__repr__() + '\n'
+        return repr_str
+
 
 class EpicsRecord:
     def __init__(self, raw_record_string):

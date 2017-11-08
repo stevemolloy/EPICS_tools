@@ -185,3 +185,13 @@ class FullFileAnalyserTest(unittest.TestCase):
             '\tinfo(autosaveFields, "VAL")\n' +
             '}'
         )
+
+    def test_whole_file_repr(self):
+        analyser_repr = self.analyser.__repr__()
+        analyser_repr = ''.join(analyser_repr).replace('\n', '').replace('\t', '')
+
+        with open('SIS8300bpm.template') as f:
+            file_str = [line.replace(' ', '') for line in f if line and not line.startswith(('#'))]
+        file_str = ''.join(file_str).replace('\n', '')
+
+        self.assertEqual(analyser_repr.replace(' ', ''), file_str.replace('\t', ''))
