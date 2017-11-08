@@ -44,20 +44,28 @@ class OneRecordFileAnalyserTest(unittest.TestCase):
         self.assertEqual(len(analyser.records[0].fields), 3)
 
     def test_field_types(self):
-        analyser = TemplateAnalyser('one_record.template')
-        record = analyser.records[0]
+        record = self.analyser.records[0]
         fields = record.fields
         self.assertEqual(fields[0].field_type, 'DTYP')
         self.assertEqual(fields[1].field_type, 'INP')
         self.assertEqual(fields[2].field_type, 'SCAN')
 
     def test_field_names(self):
-        analyser = TemplateAnalyser('one_record.template')
-        record = analyser.records[0]
+        record = self.analyser.records[0]
         fields = record.fields
         self.assertEqual(fields[0].field_name, "asynInt32")
         self.assertEqual(fields[1].field_name, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_FW_VERSION")
         self.assertEqual(fields[2].field_name, "I/O Intr")
+
+    def test_record_repr(self):
+        self.assertEqual(
+            self.analyser.records[0].__repr__(),
+            'record(longin, "$(P)$(R)BPMFWVersion_RBV") {\n' +
+            '\tfield(DTYP, "asynInt32")\n' +
+            '\tfield(INP, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_FW_VERSION")\n' +
+            '\tfield(SCAN, "I/O Intr")\n' +
+            '}'
+        )
 
 
 class FullFileAnalyserTest(unittest.TestCase):
@@ -132,8 +140,8 @@ class FullFileAnalyserTest(unittest.TestCase):
         self.assertEqual(field_list[6].field_name, "VAL")
 
     def test_fourth_record_contains_info(self):
-        first_record = self.analyser.records[4]
-        field_list = first_record.fields
+        fourth_record = self.analyser.records[4]
+        field_list = fourth_record.fields
         self.assertEqual(field_list[0].is_field, True)
         self.assertEqual(field_list[1].is_field, True)
         self.assertEqual(field_list[2].is_field, True)
@@ -150,3 +158,30 @@ class FullFileAnalyserTest(unittest.TestCase):
             if any(isinstance(field, EpicsInfo) for field in record.fields):
                 counter += 1
         self.assertEqual(counter, 15)
+
+    def test_record_repr_with_info(self):
+        fourth_record = self.analyser.records[4]
+        another_record = self.analyser.records[-4]
+
+        self.assertEqual(
+            fourth_record.__repr__(),
+            'record(longout, "$(P)$(R)NearIQM") {\n' +
+            '\tfield(DTYP, "asynInt32")\n' +
+            '\tfield(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_NEARIQ_M")\n' +
+            '\tfield(DRVH, "255")\n' +
+            '\tfield(DRVL, "0")\n' +
+            '\tfield(PINI, "YES")\n' +
+            '\tfield(VAL, "4")\n' +
+            '\tinfo(autosaveFields, "VAL")\n' +
+            '}'
+        )
+        self.assertEqual(
+            another_record.__repr__(),
+            'record(longout, "$(P)$(R)SelfTrigIQSamples") {\n' +
+            '\tfield(DTYP, "asynInt32")\n' +
+            '\tfield(OUT, "@asyn($(PORT),$(ADDR),$(TIMEOUT))BPM_SELF_TRIG_IQ_SAMPLES")\n' +
+            '\tfield(VAL, "0")\n' +
+            '\tfield(PINI, "YES")\n' +
+            '\tinfo(autosaveFields, "VAL")\n' +
+            '}'
+        )

@@ -30,6 +30,15 @@ class EpicsRecord:
         self.body_string = split_string[1]
         self.record_type = self.get_record_type()
 
+    def __repr__(self):
+        repr_str = 'record('
+        repr_str += self.get_record_type()
+        repr_str += ', "' + self.record_name + '") {\n'
+        for field in self.fields:
+            repr_str += '\t' + field.__repr__() + '\n'
+        repr_str += '}'
+        return repr_str
+
     def get_record_type(self):
         stripped_string = self.instantiation_string.replace('record(', '')
         return stripped_string.split(',')[0]
@@ -60,6 +69,9 @@ class EpicsField:
         assert(raw_string.endswith(')'))
         self.raw_string_split = raw_string.split(',', 1)
 
+    def __repr__(self):
+        return 'field(' + self.field_type + ', "' + self.field_name + '")'
+
     @property
     def field_type(self):
         return self.raw_string_split[0][1:]
@@ -76,7 +88,11 @@ class EpicsInfo(EpicsField):
     is_field = False
     is_info = True
 
+    def __repr__(self):
+        return 'info(' + self.field_type + ', "' + self.field_name + '")'
+
 
 if __name__ == '__main__':
-    analyser = TemplateAnalyser('tests/one_record.template')
-    print(analyser.records[0].fields)
+    analyser = TemplateAnalyser('tests/SIS8300bpm.template')
+    for record in analyser.records:
+        print(record)
