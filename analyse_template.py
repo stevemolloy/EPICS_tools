@@ -111,16 +111,38 @@ class EpicsInfo(EpicsField):
 if __name__ == '__main__':
     from collections import Counter
 
-    analyser = TemplateAnalyser('tests/SIS8300bpm.template')
+    SIS8300bpm = TemplateAnalyser('tests/SIS8300bpm.template')
+    SIS8300bpmN = TemplateAnalyser('tests/SIS8300bpmN.template')
+    SIS8300 = TemplateAnalyser('tests/SIS8300.template')
+    SIS8300N = TemplateAnalyser('tests/SIS8300N.template')
 
-    type_ctr = Counter(record.record_type for record in analyser.records)
+    print(SIS8300bpm.filename)
+    type_ctr = Counter(record.record_type for record in SIS8300bpm.records)
     for record_type in type_ctr.most_common():
         print(record_type)
 
-    namelist = [
-        r.record_name
-        for r in analyser.records
-        if r.record_type == 'longout'
-    ]
-    for i in namelist:
-        print(i)
+    print()
+    print(SIS8300bpmN.filename)
+    type_ctr = Counter(record.record_type for record in SIS8300bpmN.records)
+    for record_type in type_ctr.most_common():
+        print(record_type)
+
+    print()
+    print(SIS8300.filename)
+    type_ctr = Counter(record.record_type for record in SIS8300.records)
+    for record_type in type_ctr.most_common():
+        print(record_type)
+
+    print()
+    print(SIS8300N.filename)
+    type_ctr = Counter(record.record_type for record in SIS8300N.records)
+    for record_type in type_ctr.most_common():
+        print(record_type)
+
+    # namelist = [
+    #     r.record_name
+    #     for r in SIS8300bpm.records
+    #     if r.record_type == 'longout'
+    # ]
+    # for i in namelist:
+    #     print(i)
