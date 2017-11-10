@@ -5,16 +5,25 @@ class TemplateAnalyser:
     def __init__(self, filename):
         self.filename = filename
         with open(self.filename) as f:
-            self.contents = [line for line in f if not line.strip().startswith('#')]
-        self.records = self.get_records()
+            self.contents = [
+                line
+                for line in f
+                if not line.strip().startswith('#')
+            ]
 
-    def get_records(self):
-        records_start = [ind for ind, val in enumerate(self.contents) if val.startswith('record')]
-        records_end = records_start[1:] + [None]
+    @property
+    def records(self):
+        records_start = [
+            ind
+            for ind, val in enumerate(self.contents)
+            if val.startswith('record')
+        ]
+        records_end = records_start[1:]
         records_list = [
             EpicsRecord(self.make_raw_record_string(inds=(start, end)))
-            for start, end in zip(records_start, records_end)
+            for start, end in zip(records_start[:-1], records_end)
         ]
+        records_list.append(EpicsRecord(self.make_raw_record_string(inds=(records_start[-1], None))))
         return records_list
 
     def make_raw_record_string(self, inds):
@@ -51,7 +60,7 @@ class EpicsRecord:
 
     @property
     def record_name(self):
-        return self.instantiation_string.split('"')[1]
+        return str(self.instantiation_string.split('"')[1])
 
     @property
     def fields(self):
@@ -104,8 +113,14 @@ if __name__ == '__main__':
 
     analyser = TemplateAnalyser('tests/SIS8300bpm.template')
 
-    type_ctr = Counter()
-    for record in analyser.records:
-        type_ctr[record.record_type] += 1
+    type_ctr = Counter(record.record_type for record in analyser.records)
     for record_type in type_ctr.most_common():
         print(record_type)
+
+    namelist = [
+        r.record_name
+        for r in analyser.records
+        if r.record_type == 'longout'
+    ]
+    for i in namelist:
+        print(i)
