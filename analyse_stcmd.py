@@ -1,8 +1,11 @@
 from pathlib import PurePath
 from collections import defaultdict
+import re
 
 
 class StCmdAnalyser:
+    regex = r"([\w-]+)\=(\w*)(\$\(\w+\))?(.*)"
+
     def __init__(self, filename):
         self.filename = filename
         with open(self.filename) as f:
@@ -29,13 +32,17 @@ class StCmdAnalyser:
     
     @property
     def dbloadrecord_cmds(self):
-        return [line for line in self.contents if line.startswith('dbLoadRecords')]
+        return [line
+                for line in self.contents
+                if line.startswith('dbLoadRecords')]
 
     @property
     def templates(self):
         template_dict = defaultdict(list)
         for line in self.dbloadrecord_cmds:
-            template_dict[self.filename_from_command(line)].append(self.substring_from_command(line))
+            fname = self.filename_from_command(line)
+            substitutions = self.substitutions_from_command(line)
+            template_dict[fname].append(substitutions)
         return template_dict
 
     @staticmethod
@@ -44,16 +51,22 @@ class StCmdAnalyser:
         path = PurePath(cmd_str.split('"')[0])
         return path.as_posix()
 
-    def substring_from_command(self, cmd_str):
+    def substitutions_from_command(self, cmd_str):
+        inval = cmd_str.split('"')[-2]
+        return self.parse_substitutions(inval.replace(',', '\n'))
+
+    def parse_substitutions(self, subs):
+        matches = re.finditer(self.regex, subs)
+
         retval = dict()
-        substitute_str = cmd_str.split('"')[-2]
-        for item in substitute_str.replace(',', ' ').split():
-            pair = item.split('=')
-            if len(pair) == 1:
-                pair.append('')
-            pair[1] = pair[1].replace('$(', '').replace(')', '')
-            try:
-                retval[pair[0]] = self.epics_env_vars[pair[1]]
-            except KeyError:
-                retval[pair[0]] = pair[1]
+        for match in matches:
+            val = ''
+            if match.group(2):
+                val += match.group(2)
+            if match.group(3):
+                val += self.epics_env_vars[match.group(3)[2:-1]]
+            if match.group(4):
+                val += match.group(4)
+            retval[match.group(1)] = val
+
         return retval
