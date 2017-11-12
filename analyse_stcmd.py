@@ -4,7 +4,13 @@ import re
 
 
 class StCmdAnalyser:
-    regex = r"([\w-]+)\=(\w*)(\$\(\w+\))?(.*)"
+    verbose_regex = r"""
+        ([\w-]+)        # Group #1. LHS of equality. Alphanums + "_" + "-"
+        \=              # The equals sign
+        ([\w-]*)        # Group #2. Any chars prefixing an env var substitution
+        (\$\([\w-]+\))? # Group #3. An env var substitution. e.g. $(PORT)
+        (.*)            # Group #4. Any chars suffixing an env var substitution
+    """
 
     def __init__(self, filename):
         with open(filename) as f:
@@ -52,7 +58,7 @@ class StCmdAnalyser:
         return self.parse_substitutions(inval.replace(',', '\n'))
 
     def parse_substitutions(self, subs):
-        matches = re.finditer(self.regex, subs)
+        matches = re.finditer(self.verbose_regex, subs, re.VERBOSE)
 
         retval = dict()
         for match in matches:
