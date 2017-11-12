@@ -7,13 +7,13 @@ class StCmdAnalyser:
     regex = r"([\w-]+)\=(\w*)(\$\(\w+\))?(.*)"
 
     def __init__(self, filename):
-        self.filename = filename
-        with open(self.filename) as f:
+        with open(filename) as f:
             self.contents = [line.replace('\n', '') for line in f]
         self.contents = [line for line in self.contents if line]
+        self.epics_env_vars = self.get_epics_env_vars()
+        self.dbloadrecord_cmds = self.get_dbloadrecord_cmds()
 
-    @property
-    def epics_env_vars(self):
+    def get_epics_env_vars(self):
         retval = dict()
         for line in self.contents:
             if not line.startswith('epicsEnvSet'):
@@ -24,14 +24,10 @@ class StCmdAnalyser:
 
     @staticmethod
     def parse_envset(line):
-        line = line.replace('epicsEnvSet(', '')
-        line = line.replace('"', '')
-        line = line.replace(')', '')
-        pairs = line.split()
-        return pairs
-    
-    @property
-    def dbloadrecord_cmds(self):
+        line = re.sub(r'(epicsEnvSet\(|"|\))', '', line)
+        return line.split()
+
+    def get_dbloadrecord_cmds(self):
         return [line
                 for line in self.contents
                 if line.startswith('dbLoadRecords')]
@@ -61,12 +57,13 @@ class StCmdAnalyser:
         retval = dict()
         for match in matches:
             val = ''
-            if match.group(2):
-                val += match.group(2)
-            if match.group(3):
-                val += self.epics_env_vars[match.group(3)[2:-1]]
-            if match.group(4):
-                val += match.group(4)
+            prefix, subst, suffix = match.group(2), match.group(3), match.group(4)
+            if prefix:
+                val += prefix
+            if subst:
+                val += self.epics_env_vars[subst[2:-1]]
+            if suffix:
+                val += suffix
             retval[match.group(1)] = val
 
         return retval
