@@ -160,8 +160,9 @@ class FullFileAnalyserTest(unittest.TestCase):
         self.assertEqual(counter, 15)
 
     def test_record_repr_with_info(self):
-        fourth_record = self.analyser.records[4]
-        another_record = self.analyser.records[-4]
+        rec = self.analyser.records
+        fourth_record = rec[4]
+        another_record = rec[-4]
 
         self.assertEqual(
             fourth_record.__repr__(),

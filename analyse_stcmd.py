@@ -6,7 +6,7 @@ import re
 class StCmdAnalyser:
     verbose_regex = r"""
         ([\w-]+)        # Group #1. LHS of equality. Alphanums + "_" + "-"
-        \=              # The equals sign
+        \=              # The  equals sign
         ([\w-]*)        # Group #2. Any chars prefixing an env var substitution
         (\$\([\w-]+\))? # Group #3. An env var substitution. e.g. $(PORT)
         (.*)            # Group #4. Any chars suffixing an env var substitution
@@ -39,7 +39,7 @@ class StCmdAnalyser:
                 if line.startswith('dbLoadRecords')]
 
     @property
-    def templates(self):
+    def template_dict(self):
         template_dict = defaultdict(list)
         for line in self.dbloadrecord_cmds:
             fname = self.filename_from_command(line)
@@ -73,3 +73,8 @@ class StCmdAnalyser:
             retval[match.group(1)] = val
 
         return retval
+
+
+if __name__ == '__main__':
+    analyser = StCmdAnalyser('tests/st.cmd')
+    print(analyser.dbloadrecord_cmds)

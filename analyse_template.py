@@ -44,6 +44,7 @@ class EpicsRecord:
         self.instantiation_string = split_string[0]
         self.body_string = split_string[1]
         self.record_type = self.get_record_type()
+        self.record_name = self.get_record_name()
 
     def __repr__(self):
         repr_str = 'record('
@@ -58,8 +59,7 @@ class EpicsRecord:
         stripped_string = self.instantiation_string.replace('record(', '')
         return stripped_string.split(',')[0]
 
-    @property
-    def record_name(self):
+    def get_record_name(self):
         return str(self.instantiation_string.split('"')[1])
 
     @property
@@ -138,6 +138,8 @@ if __name__ == '__main__':
     type_ctr = Counter(record.record_type for record in SIS8300N.records)
     for record_type in type_ctr.most_common():
         print(record_type)
+
+    print(SIS8300bpm)
 
     # namelist = [
     #     r.record_name

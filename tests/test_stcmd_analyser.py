@@ -16,7 +16,7 @@ class StCmdAnalyserTester(unittest.TestCase):
         for line in self.analyser.contents:
             self.assertNotEqual(line, '\n')
 
-    def test_no_linefeeds(self):
+    def test_no_bare_linefeeds(self):
         for line in self.analyser.contents:
             self.assertNotIn('\n', line)
 
@@ -34,17 +34,18 @@ class StCmdAnalyserTester(unittest.TestCase):
 
     def test_finding_template_files(self):
         a = self.analyser
-        self.assertEqual(len(a.templates), 11)
+        self.assertEqual(len(a.template_dict), 11)
 
     def test_listing_substitutions(self):
         a = self.analyser
-        self.assertEqual(a.templates['$(MRFIOC2)/db/evr-mtca-300.db'],
+        template_dict = a.template_dict
+        self.assertEqual(template_dict['$(MRFIOC2)/db/evr-mtca-300.db'],
                          [{'DEVICE': 'EVR', 'SYS': 'BPM', 'Link-Clk-SP': '88.0525'}])
-        self.assertEqual(a.templates["$(SIS8300)/db/SIS8300.template"],
+        self.assertEqual(template_dict["$(SIS8300)/db/SIS8300.template"],
                          [{'P': 'BPM:', 'R': '', 'PORT': 'BPM', 'ADDR': '0', 'TIMEOUT': '1'}])
-        self.assertEqual(len(a.templates["$(SIS8300)/db/SIS8300.template"]), 1)
-        self.assertEqual(len(a.templates["$(SIS8300)/db/SIS8300N.template"]), 10)
-        self.assertEqual(a.templates["$(SIS8300)/db/SIS8300N.template"],
+        self.assertEqual(len(template_dict["$(SIS8300)/db/SIS8300.template"]), 1)
+        self.assertEqual(len(template_dict["$(SIS8300)/db/SIS8300N.template"]), 10)
+        self.assertEqual(template_dict["$(SIS8300)/db/SIS8300N.template"],
              [
                  {'P': 'BPM:', 'R': 'AI0:', 'PORT': 'BPM', 'ADDR': '0', 'TIMEOUT': '1', 'NAME': 'AI0'},
                  {'P': 'BPM:', 'R': 'AI1:', 'PORT': 'BPM', 'ADDR': '1', 'TIMEOUT': '1', 'NAME': 'AI1'},
