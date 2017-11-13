@@ -11,7 +11,7 @@ class IocFromStCmd:
         self.db_files = self.get_db_files()
 
     def get_db_files(self):
-        print(os.environ.get('BPM'))
+        # print(os.environ.get('BPM'))
         return self.get_filename_envvars()
 
     def get_filename_envvars(self):

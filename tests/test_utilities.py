@@ -5,8 +5,16 @@ from utilities import remove_envvars, add_envvars
 
 
 class TestRemoveEnvvars(unittest.TestCase):
+    def test_it_makes_sense_to_check_before_and_after(self):
+        env_at_start = os.environ.copy()
+        self.assertTrue('BLAHBLU' not in os.environ)
+        os.environ['BLAHBLU'] = 'hello'
+        self.assertTrue('BLAHBLU' in os.environ)
+        self.assertEqual(os.environ['BLAHBLU'], 'hello')
+        self.assertNotEqual(env_at_start, os.environ)
+
     def test_does_nothing_with_nonexistent_var(self):
-        env_at_start = os.environ
+        env_at_start = os.environ.copy()
         var_to_remove = 'BLAHBLAH'
         self.assertTrue(var_to_remove not in os.environ)
         with remove_envvars([var_to_remove]):
