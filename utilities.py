@@ -14,6 +14,7 @@ def remove_envvars(envvar_list):
     for envvar, val in preservation_list.items():
         os.environ[envvar] = val
 
+
 @contextmanager
 def add_envvars(envar_dict):
     for var in envar_dict:

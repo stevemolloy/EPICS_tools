@@ -1,5 +1,4 @@
 import unittest
-import os
 
 from utilities import remove_envvars, add_envvars
 from ioc_from_stcmd import IocFromStCmd

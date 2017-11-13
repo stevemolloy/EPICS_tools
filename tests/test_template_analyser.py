@@ -192,7 +192,7 @@ class FullFileAnalyserTest(unittest.TestCase):
         analyser_repr = ''.join(analyser_repr).replace('\n', '').replace('\t', '')
 
         with open('SIS8300bpm.template') as f:
-            file_str = [line.replace(' ', '') for line in f if line and not line.startswith(('#'))]
+            file_str = [line.replace(' ', '') for line in f if line and not line.startswith('#')]
         file_str = ''.join(file_str).replace('\n', '')
 
         self.assertEqual(analyser_repr.replace(' ', ''), file_str.replace('\t', ''))
