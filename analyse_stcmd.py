@@ -25,7 +25,7 @@ class StCmdAnalyser:
             if not line.startswith('epicsEnvSet'):
                 continue
             value_pair = self.parse_envset(line)
-            retval[value_pair[0].replace(b',', b'')] = value_pair[1]
+            retval[value_pair[0].replace(',', '')] = value_pair[1]
         return retval
 
     @staticmethod
