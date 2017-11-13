@@ -13,3 +13,16 @@ def remove_envvars(envvar_list):
 
     for envvar, val in preservation_list.items():
         os.environ[envvar] = val
+
+@contextmanager
+def add_envvars(envar_dict):
+    for var in envar_dict:
+        print(var)
+        assert(var not in os.environ)
+    for var, val in envar_dict.items():
+        os.environ[var] = val
+
+    yield
+
+    for var in envar_dict:
+        os.environ.pop(var)
