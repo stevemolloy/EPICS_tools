@@ -3,6 +3,7 @@ from pathlib import Path
 
 from utilities import remove_envvars, add_envvars
 from ioc_from_stcmd import IocFromStCmd
+from analyse_template import TemplateAnalyser
 
 
 class IocFromStCmdTester(unittest.TestCase):
@@ -73,3 +74,18 @@ class IocFromStCmdTester(unittest.TestCase):
                 if file != 'evr-mtca-300.db' and file != 'evr-softEvent.template' and file != 'evr-pulserMap.template':
                     self.assertTrue(Path(file).exists(), msg=f'{file} does not exist')
                     self.assertTrue(Path(file).is_file(), msg=f'{file} is not a file')
+
+    def test_files_are_expanded_into_templates(self):
+        envvar_list = [
+            'SIS8300',
+            'BPM',
+            'ADCORE',
+            'MRFIOC2',
+        ]
+        with remove_envvars(envvar_list):
+            ioc = IocFromStCmd('st.cmd')
+            for filename, template in ioc.templates.items():
+                if filename == 'evr-mtca-300.db' or filename == 'evr-softEvent.template' or filename == 'evr-pulserMap.template':
+                    self.assertIsNone(template)
+                else:
+                    self.assertIsInstance(template, TemplateAnalyser)
