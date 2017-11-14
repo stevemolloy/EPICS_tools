@@ -11,17 +11,18 @@ class IocFromStCmd:
         self.db_files = self.get_db_files()
 
     @property
-    def filenames(self):
+    def raw_filenames(self):
         return self.stcmd_analyser.template_dict.keys()
 
     def get_db_files(self):
         envvars = []
         regex = r"\$\((\w+)\)"
-        for filename in self.filenames:
-            matches = re.finditer(regex, filename)
-            for match in matches:
+        for filename in self.raw_filenames:
+            for match in re.finditer(regex, filename):
                 if match.group(1) in os.environ:
-                    envvars.append(re.sub(regex, os.environ[match.group(1)], filename))
+                    envvars.append(
+                        re.sub(regex, os.environ[match.group(1)], filename)
+                    )
                 else:
                     envvars.append(PurePath(filename).name)
         return envvars
