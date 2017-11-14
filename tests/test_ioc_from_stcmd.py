@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 from utilities import remove_envvars, add_envvars
 from ioc_from_stcmd import IocFromStCmd
@@ -58,3 +59,17 @@ class IocFromStCmdTester(unittest.TestCase):
                     'mrfioc2folder/db/evr-pulserMap.template',
                 ]
             )
+
+    def test_files_can_be_found(self):
+        envvar_list = [
+            'SIS8300',
+            'BPM',
+            'ADCORE',
+            'MRFIOC2',
+        ]
+        with remove_envvars(envvar_list):
+            ioc = IocFromStCmd('st.cmd')
+            for file in ioc.db_files:
+                if file != 'evr-mtca-300.db' and file != 'evr-softEvent.template' and file != 'evr-pulserMap.template':
+                    self.assertTrue(Path(file).exists(), msg=f'{file} does not exist')
+                    self.assertTrue(Path(file).is_file(), msg=f'{file} is not a file')
