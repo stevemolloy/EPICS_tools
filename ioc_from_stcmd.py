@@ -1,9 +1,11 @@
 import re
 import os
 from pathlib import PurePath, Path
+from collections.abc import MutableMapping
 
 from analyse_stcmd import StCmdAnalyser
 from analyse_template import TemplateAnalyser
+from utilities import remove_envvars
 
 
 class IocFromStCmd:
@@ -30,12 +32,58 @@ class IocFromStCmd:
         return envvars
 
     def get_templates(self):
-        ret_dict = dict(
+        ret_dict = DynamicDict(
             zip(self.db_files, [
-                TemplateAnalyser(filename)
+                filename
                 if Path(filename).exists() else None
                 for filename in self.db_files
             ])
         )
 
         return ret_dict
+
+
+class DynamicDict(MutableMapping):
+    def __init__(self, *args, **kw):
+        self._storage = dict(*args, **kw)
+
+    def __len__(self):
+        return len(self._storage)
+
+    def __getitem__(self, item):
+        value = self._storage[item]
+        if type(value) is TemplateAnalyser:
+            return value
+        try:
+            self._storage[item] = TemplateAnalyser(item)
+        except FileNotFoundError:
+            pass
+        return self._storage[item]
+
+    def __delitem__(self, key):
+        self._storage.pop(key)
+
+    def __iter__(self):
+        for key in self._storage:
+            yield key
+
+    def __setitem__(self, key, value):
+        self._storage.__setitem__(key, value)
+
+    def items(self):
+        for key in self._storage:
+            yield key, self.__getitem__(key)
+
+
+if __name__ == "__main__":
+    envvar_list = [
+        'SIS8300',
+        'BPM',
+        'ADCORE',
+        'MRFIOC2',
+    ]
+    os.chdir('tests')
+    with remove_envvars(envvar_list):
+        ioc = IocFromStCmd('st.cmd')
+        for k, v in ioc.templates.items():
+            print(v)
