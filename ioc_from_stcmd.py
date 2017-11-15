@@ -64,7 +64,7 @@ class DynamicDict(MutableMapping):
         self._storage.pop(key)
 
     def __iter__(self):
-        return self._storage.items()
+        return self._storage.__iter__()
 
     def __setitem__(self, key, value):
         self._storage.__setitem__(key, value)
@@ -84,5 +84,5 @@ if __name__ == "__main__":
     os.chdir('tests')
     with remove_envvars(envvar_list):
         ioc = IocFromStCmd('st.cmd')
-        for k, v in ioc.templates.items():
-            print(v)
+        for i in ioc.templates.keys():
+            print(i)
