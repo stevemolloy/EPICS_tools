@@ -101,3 +101,5 @@ class IocFromStCmdTester(unittest.TestCase):
             ioc = IocFromStCmd('st.cmd')
             template = ioc.templates['SIS8300.template']
             self.assertIsInstance(template, TemplateAnalyser)
+            record_name_list = [rec.record_name for rec in template.records]
+            self.assertIn('BPM:DeviceType_RBV', record_name_list)
