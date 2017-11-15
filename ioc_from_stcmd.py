@@ -64,8 +64,7 @@ class DynamicDict(MutableMapping):
         self._storage.pop(key)
 
     def __iter__(self):
-        for key in self._storage:
-            yield key
+        return self._storage.items()
 
     def __setitem__(self, key, value):
         self._storage.__setitem__(key, value)
