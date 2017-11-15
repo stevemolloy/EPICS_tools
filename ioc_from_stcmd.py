@@ -30,10 +30,12 @@ class IocFromStCmd:
         return envvars
 
     def get_templates(self):
-        return dict(
+        ret_dict = dict(
             zip(self.db_files, [
                 TemplateAnalyser(filename)
                 if Path(filename).exists() else None
                 for filename in self.db_files
             ])
         )
+
+        return ret_dict
