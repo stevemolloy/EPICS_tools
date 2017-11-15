@@ -89,3 +89,15 @@ class IocFromStCmdTester(unittest.TestCase):
                     self.assertIsNone(template)
                 else:
                     self.assertIsInstance(template, TemplateAnalyser)
+
+    def test_expanded_templates_are_really_expanded(self):
+        envvar_list = [
+            'SIS8300',
+            'BPM',
+            'ADCORE',
+            'MRFIOC2',
+        ]
+        with remove_envvars(envvar_list):
+            ioc = IocFromStCmd('st.cmd')
+            template = ioc.templates['SIS8300.template']
+            self.assertIsInstance(template, TemplateAnalyser)

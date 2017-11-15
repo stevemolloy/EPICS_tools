@@ -116,35 +116,8 @@ if __name__ == '__main__':
     SIS8300 = TemplateAnalyser('tests/SIS8300.template')
     SIS8300N = TemplateAnalyser('tests/SIS8300N.template')
 
-    print(SIS8300bpm.filename)
-    type_ctr = Counter(record.record_type for record in SIS8300bpm.records)
-    for record_type in type_ctr.most_common():
-        print(record_type)
-
-    print()
-    print(SIS8300bpmN.filename)
-    type_ctr = Counter(record.record_type for record in SIS8300bpmN.records)
-    for record_type in type_ctr.most_common():
-        print(record_type)
-
-    print()
     print(SIS8300.filename)
     type_ctr = Counter(record.record_type for record in SIS8300.records)
     for record_type in type_ctr.most_common():
         print(record_type)
-
-    print()
-    print(SIS8300N.filename)
-    type_ctr = Counter(record.record_type for record in SIS8300N.records)
-    for record_type in type_ctr.most_common():
-        print(record_type)
-
-    print(SIS8300bpm)
-
-    # namelist = [
-    #     r.record_name
-    #     for r in SIS8300bpm.records
-    #     if r.record_type == 'longout'
-    # ]
-    # for i in namelist:
-    #     print(i)
+    print([rec.record_name for rec in SIS8300.records])
